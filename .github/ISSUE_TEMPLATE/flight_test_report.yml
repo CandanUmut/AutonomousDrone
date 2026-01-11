@@ -1,0 +1,20 @@
+name: Flight test report
+description: Log a flight test result.
+title: "[Flight Test] "
+labels: [test, flight]
+body:
+  - type: textarea
+    attributes:
+      label: Test objectives
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Conditions
+      description: Weather, wind, location, aircraft configuration.
+  - type: textarea
+    attributes:
+      label: Results and metrics
+  - type: textarea
+    attributes:
+      label: Issues or anomalies

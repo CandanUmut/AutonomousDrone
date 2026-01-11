@@ -1,0 +1,3 @@
+# Gazebo
+
+Simulation environment notes.

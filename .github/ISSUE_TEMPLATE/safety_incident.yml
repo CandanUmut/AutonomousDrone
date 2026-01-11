@@ -1,0 +1,19 @@
+name: Safety incident
+description: Report a safety incident or near-miss.
+title: "[Safety Incident] "
+labels: [safety]
+body:
+  - type: textarea
+    attributes:
+      label: Incident summary
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Immediate actions taken
+  - type: textarea
+    attributes:
+      label: Root cause analysis (initial)
+  - type: textarea
+    attributes:
+      label: Preventive actions
