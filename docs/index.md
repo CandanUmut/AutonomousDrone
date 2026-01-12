@@ -2,12 +2,18 @@
 
 ## How to read this repo
 1. **Vision** → **MVP Requirements** → **System Architecture**
-2. **Testing Strategy** → **Flight Testing Plan**
-3. **Compliance** → **Roadmap**
+2. **Dev Setup** → **Software Architecture** → **Interfaces**
+3. **Testing Strategy** → **Flight Testing Plan**
+4. **Compliance** → **Roadmap**
 
 ## Table of contents
 - [Vision](vision.md)
 - [Glossary](glossary.md)
+- [Developer Setup](Dev-Setup.md)
+- [Software Architecture](Software-Architecture.md)
+- [Interfaces](Interfaces.md)
+- [Telemetry & Logging](Telemetry-Logging.md)
+- [Project Management](Project-Management.md)
 - [MVP Requirements](MVP-Requirements.md)
 - [System Architecture](System-Architecture.md)
 - [Concept of Operations (ConOps)](ConOps.md)

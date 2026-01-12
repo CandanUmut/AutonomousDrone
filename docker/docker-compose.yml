@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  companion:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+    volumes:
+      - ..:/workspace
+    working_dir: /workspace
+    command: ["bash", "-lc", "drone-platform mission-demo --config software/companion/src/drone_platform/config/default.yaml"]
+    network_mode: "host"
