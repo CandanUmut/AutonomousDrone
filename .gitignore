@@ -5,6 +5,7 @@ Thumbs.db
 # Python
 __pycache__/
 *.pyc
+.venv/
 
 # Editor
 .vscode/
@@ -12,6 +13,7 @@ __pycache__/
 
 # Logs
 *.log
+software/logs/
 
 # Build artifacts
 build/

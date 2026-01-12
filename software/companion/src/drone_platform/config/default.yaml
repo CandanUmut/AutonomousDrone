@@ -1,0 +1,29 @@
+connection:
+  system_address: "udp://:14540"
+mission:
+  takeoff_alt_m: 10.0
+  rtl_alt_m: 15.0
+  waypoints:
+    - lat: 47.397742
+      lon: 8.545594
+      alt_m: 10.0
+    - lat: 47.397825
+      lon: 8.546112
+      alt_m: 10.0
+    - lat: 47.397383
+      lon: 8.546179
+      alt_m: 10.0
+geofence:
+  center_lat: 47.397742
+  center_lon: 8.545594
+  radius_m: 150.0
+  min_alt_m: 0.0
+  max_alt_m: 120.0
+safety:
+  mode: "sim"
+  allow_hardware: false
+  sim_only_banner: true
+logging:
+  level: "INFO"
+  log_dir: "software/logs"
+  json: true

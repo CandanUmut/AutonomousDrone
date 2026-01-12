@@ -1,0 +1,16 @@
+FROM python:3.11-slim
+
+WORKDIR /workspace
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git curl build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY software/companion/pyproject.toml /workspace/software/companion/pyproject.toml
+COPY software/companion/src /workspace/software/companion/src
+COPY software/companion/README.md /workspace/software/companion/README.md
+
+RUN python -m pip install --upgrade pip \
+    && pip install -e /workspace/software/companion[dev]
+
+CMD ["bash"]

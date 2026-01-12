@@ -1,0 +1,48 @@
+name: "Simulation regression"
+description: "Report a regression in PX4 SITL or mission demo"
+labels: ["type:simulation", "type:bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a simulation regression.
+  - type: input
+    id: sitl_version
+    attributes:
+      label: PX4 SITL version
+      placeholder: "v1.14.x or commit hash"
+    validations:
+      required: true
+  - type: input
+    id: mavsdk_version
+    attributes:
+      label: MAVSDK version
+      placeholder: "pip show mavsdk"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. make sim\n2. make mission"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      placeholder: "Attach software/logs/mission.log"
+    validations:
+      required: false
