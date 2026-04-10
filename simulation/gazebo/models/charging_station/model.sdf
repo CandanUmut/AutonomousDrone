@@ -1,0 +1,108 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <model name="charging_station">
+    <static>true</static>
+
+    <!-- Base platform -->
+    <link name="base">
+      <pose>0 0 0.1 0 0 0</pose>
+      <collision name="base_col">
+        <geometry><box><size>2.0 1.5 0.2</size></box></geometry>
+      </collision>
+      <visual name="base_vis">
+        <geometry><box><size>2.0 1.5 0.2</size></box></geometry>
+        <material>
+          <ambient>0.3 0.3 0.35 1</ambient>
+          <diffuse>0.4 0.4 0.45 1</diffuse>
+        </material>
+      </visual>
+    </link>
+
+    <!-- Battery bay housing -->
+    <link name="battery_bay">
+      <pose>0.5 0 0.35 0 0 0</pose>
+      <collision name="bay_col">
+        <geometry><box><size>0.8 0.4 0.3</size></box></geometry>
+      </collision>
+      <visual name="bay_vis">
+        <geometry><box><size>0.8 0.4 0.3</size></box></geometry>
+        <material>
+          <ambient>0.15 0.15 0.15 1</ambient>
+          <diffuse>0.2 0.2 0.2 1</diffuse>
+        </material>
+      </visual>
+      <!-- Bay door (visual indicator - open) -->
+      <visual name="bay_door">
+        <pose>0.41 0 0 0 0 0</pose>
+        <geometry><box><size>0.02 0.42 0.32</size></box></geometry>
+        <material><ambient>0.2 0.5 0.2 1</ambient></material>
+      </visual>
+    </link>
+
+    <!-- Control box -->
+    <link name="control_box">
+      <pose>-0.5 0 0.35 0 0 0</pose>
+      <collision name="ctrl_col">
+        <geometry><box><size>0.5 0.4 0.3</size></box></geometry>
+      </collision>
+      <visual name="ctrl_vis">
+        <geometry><box><size>0.5 0.4 0.3</size></box></geometry>
+        <material><ambient>0.2 0.2 0.25 1</ambient></material>
+      </visual>
+      <!-- Status LED (green = ready) -->
+      <visual name="status_led">
+        <pose>0.26 0 0.1 0 0 0</pose>
+        <geometry><sphere><radius>0.03</radius></sphere></geometry>
+        <material>
+          <ambient>0 1 0 1</ambient>
+          <diffuse>0 1 0 1</diffuse>
+          <emissive>0 0.8 0 1</emissive>
+        </material>
+      </visual>
+    </link>
+
+    <!-- Solar panel support mast -->
+    <link name="mast">
+      <pose>-0.8 -0.6 0.75 0 0 0</pose>
+      <collision name="mast_col">
+        <geometry><cylinder><radius>0.04</radius><length>1.0</length></cylinder></geometry>
+      </collision>
+      <visual name="mast_vis">
+        <geometry><cylinder><radius>0.04</radius><length>1.0</length></cylinder></geometry>
+        <material><ambient>0.5 0.5 0.5 1</ambient></material>
+      </visual>
+    </link>
+
+    <!-- Solar panel array (2 panels tilted 20° south) -->
+    <link name="solar_panel_1">
+      <pose>-0.5 -0.6 1.35 0.349 0 0</pose>
+      <collision name="panel1_col">
+        <geometry><box><size>0.8 0.6 0.03</size></box></geometry>
+      </collision>
+      <visual name="panel1_vis">
+        <geometry><box><size>0.8 0.6 0.03</size></box></geometry>
+        <material>
+          <ambient>0.05 0.08 0.25 1</ambient>
+          <diffuse>0.07 0.1 0.35 1</diffuse>
+          <specular>0.3 0.3 0.4 1</specular>
+        </material>
+      </visual>
+    </link>
+
+    <link name="solar_panel_2">
+      <pose>0.35 -0.6 1.35 0.349 0 0</pose>
+      <collision name="panel2_col">
+        <geometry><box><size>0.8 0.6 0.03</size></box></geometry>
+      </collision>
+      <visual name="panel2_vis">
+        <geometry><box><size>0.8 0.6 0.03</size></box></geometry>
+        <material>
+          <ambient>0.05 0.08 0.25 1</ambient>
+          <diffuse>0.07 0.1 0.35 1</diffuse>
+          <specular>0.3 0.3 0.4 1</specular>
+        </material>
+      </visual>
+    </link>
+
+  </model>
+</sdf>

@@ -1,0 +1,73 @@
+<?xml version="1.0" ?>
+<!--
+  Landing pad with ArUco Marker ID 0 (DICT_4X4_50).
+
+  The 1.2 m × 1.2 m yellow pad has a white 0.5 m square in the centre
+  representing the ArUco marker. In a real environment the marker texture
+  would be applied; in simulation the precision_landing_node subscribes to
+  /camera/down/image_raw and detects the contrasting square pattern or,
+  when a proper texture is applied, the actual ArUco corners.
+
+  To apply a real ArUco texture:
+    1. Generate marker PNG: python3 -c "import cv2; cv2.imwrite('aruco_0.png',
+       cv2.aruco.generateImageMarker(cv2.aruco.getPredefinedDictionary(
+       cv2.aruco.DICT_4X4_50), 0, 256))"
+    2. Place in simulation/gazebo/models/landing_pad/materials/textures/
+    3. Add a <material><script> block referencing the texture in the visual.
+-->
+<sdf version="1.6">
+  <model name="landing_pad">
+    <static>true</static>
+
+    <link name="pad">
+      <pose>0 0 0 0 0 0</pose>
+
+      <!-- Main pad surface -->
+      <collision name="pad_col">
+        <geometry><box><size>1.2 1.2 0.02</size></box></geometry>
+      </collision>
+      <visual name="pad_vis">
+        <geometry><box><size>1.2 1.2 0.02</size></box></geometry>
+        <material>
+          <ambient>0.9 0.8 0.0 1</ambient>
+          <diffuse>1.0 0.9 0.0 1</diffuse>
+        </material>
+      </visual>
+
+      <!-- ArUco marker representation (white square centre) -->
+      <visual name="marker_bg">
+        <pose>0 0 0.011 0 0 0</pose>
+        <geometry><box><size>0.52 0.52 0.001</size></box></geometry>
+        <material><ambient>1 1 1 1</ambient><diffuse>1 1 1 1</diffuse></material>
+      </visual>
+      <visual name="marker_block_tl">
+        <pose>-0.13 0.13 0.012 0 0 0</pose>
+        <geometry><box><size>0.1 0.1 0.001</size></box></geometry>
+        <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+      </visual>
+      <visual name="marker_block_tr">
+        <pose>0.13 0.13 0.012 0 0 0</pose>
+        <geometry><box><size>0.1 0.1 0.001</size></box></geometry>
+        <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+      </visual>
+      <visual name="marker_block_bl">
+        <pose>-0.13 -0.13 0.012 0 0 0</pose>
+        <geometry><box><size>0.1 0.1 0.001</size></box></geometry>
+        <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+      </visual>
+      <visual name="marker_block_br">
+        <pose>0.13 -0.13 0.012 0 0 0</pose>
+        <geometry><box><size>0.1 0.1 0.001</size></box></geometry>
+        <material><ambient>0 0 0 1</ambient><diffuse>0 0 0 1</diffuse></material>
+      </visual>
+
+      <!-- Quadrant direction arrows -->
+      <visual name="north_arrow">
+        <pose>0 0.45 0.011 0 0 0</pose>
+        <geometry><box><size>0.04 0.15 0.001</size></box></geometry>
+        <material><ambient>1 0.2 0.2 1</ambient><diffuse>1 0.2 0.2 1</diffuse></material>
+      </visual>
+
+    </link>
+  </model>
+</sdf>

@@ -1,0 +1,63 @@
+# ArduCopter SITL parameter file — Delivery Drone
+# Load with: --add-param-file=copter_delivery.parm
+#
+# These tune the SITL for our 450mm delivery quad profile.
+# Verify all values in real hardware before first flight.
+
+# ── Frame ──────────────────────────────────────────────────────────────────
+FRAME_CLASS,1        # Quad
+FRAME_TYPE,1         # X configuration
+
+# ── Arming ─────────────────────────────────────────────────────────────────
+ARMING_CHECK,1       # Standard arming checks
+ARMING_RUDDER,0      # Disable rudder arming (companion computer arms)
+
+# ── Failsafes ──────────────────────────────────────────────────────────────
+FS_THR_ENABLE,1      # RC throttle failsafe → RTL
+FS_THR_VALUE,975     # PWM below this = link lost
+FS_GCS_ENABLE,2      # GCS link failsafe → RTL
+FS_BATT_ENABLE,1     # Battery failsafe → RTL at low, land at critical
+BATT_LOW_VOLT,21.0   # 3.5 V/cell × 6S — low voltage RTL
+BATT_CRT_VOLT,19.2   # 3.2 V/cell × 6S — critical land in place
+BATT_CAPACITY,6000   # mAh — 6000 mAh 6S pack
+BATT_MONITOR,4       # Analog voltage+current
+
+# ── Geofence ────────────────────────────────────────────────────────────────
+FENCE_ENABLE,1
+FENCE_TYPE,3         # Circle + altitude
+FENCE_RADIUS,200     # metres from home — covers delivery world
+FENCE_ALT_MAX,50     # metres AMSL maximum altitude (simulation)
+FENCE_ACTION,1       # RTL on breach
+
+# ── EKF ─────────────────────────────────────────────────────────────────────
+EK3_ENABLE,1         # Use EKF3
+EK2_ENABLE,0
+
+# ── Telemetry ────────────────────────────────────────────────────────────────
+SR0_ADSB,0
+SR0_EXT_STAT,2       # 2 Hz
+SR0_EXTRA1,10        # ATTITUDE — 10 Hz
+SR0_EXTRA2,10        # VFR_HUD — 10 Hz
+SR0_EXTRA3,2         # AHRS, SYS_STATUS — 2 Hz
+SR0_POSITION,3       # GLOBAL_POSITION_INT — 3 Hz
+SR0_RAW_CTRL,0
+SR0_RAW_SENS,2       # RAW_IMU — 2 Hz
+SR0_RC_CHAN,0
+
+# ── Navigation ───────────────────────────────────────────────────────────────
+WPNAV_SPEED,500      # 5 m/s horizontal cruise in AUTO mode (cm/s)
+WPNAV_RADIUS,200     # 2 m waypoint acceptance radius (cm)
+LAND_SPEED,50        # 50 cm/s landing descent rate (cm/s)
+LAND_SPEED_HIGH,150  # 150 cm/s initial descent rate
+
+# ── Delivery attitude limits ─────────────────────────────────────────────────
+ATC_ANG_RLL_P,4.5
+ATC_ANG_PIT_P,4.5
+ATC_RATE_RLL_MAX,360 # deg/s
+ATC_RATE_PIT_MAX,360
+
+# ── SITL-specific ────────────────────────────────────────────────────────────
+SIM_BARO_RND,0.5     # Baro noise (Pa) — simulates altitude jitter
+SIM_GPS_NOISE,0.25   # GPS position noise (m)
+SIM_WIND_SPD,2       # 2 m/s wind in simulation
+SIM_WIND_DIR,45      # Wind from NE

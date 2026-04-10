@@ -1,0 +1,434 @@
+<?xml version="1.0" ?>
+<!--
+  Delivery Drone — 450mm quadrotor (X-configuration)
+
+  Motor layout (ArduCopter X, viewed from above):
+    Motor 1 (Front-Right): CW  — channel 0
+    Motor 2 (Rear-Left):   CW  — channel 1
+    Motor 3 (Front-Left):  CCW — channel 2
+    Motor 4 (Rear-Right):  CCW — channel 3
+
+  Arm length: 225 mm → motor offsets ±0.159 m (225 * cos/sin 45°)
+  Total mass (sim): 2.5 kg  (incl. simulated payload)
+
+  Requires: ardupilot_gazebo plugin (https://github.com/ArduPilot/ardupilot_gazebo)
+  ROS 2 plugins: gazebo_ros_pkgs (Humble)
+
+  Sensors published as ROS 2 topics:
+    /imu/data              (sensor_msgs/Imu)
+    /gps/fix               (sensor_msgs/NavSatFix)
+    /camera/down/image_raw (sensor_msgs/Image)
+    /camera/down/camera_info (sensor_msgs/CameraInfo)
+    /camera/forward/image_raw (sensor_msgs/Image)
+    /scan                  (sensor_msgs/LaserScan)
+-->
+<sdf version="1.6">
+  <model name="delivery_drone">
+
+    <!-- ================================================================
+         BASE LINK
+    ================================================================ -->
+    <link name="base_link">
+      <inertial>
+        <mass>2.5</mass>
+        <inertia>
+          <!-- Approximate inertia for 450mm X-frame at 2.5 kg -->
+          <ixx>0.0820</ixx>
+          <ixy>0.0</ixy>
+          <ixz>0.0</ixz>
+          <iyy>0.0820</iyy>
+          <iyz>0.0</iyz>
+          <izz>0.1490</izz>
+        </inertia>
+      </inertial>
+
+      <!-- Central body (box visual) -->
+      <visual name="body_visual">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.18 0.18 0.06</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.1 0.1 0.1 1</ambient>
+          <diffuse>0.2 0.2 0.2 1</diffuse>
+          <specular>0.05 0.05 0.05 1</specular>
+        </material>
+      </visual>
+      <collision name="body_collision">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.18 0.18 0.06</size>
+          </box>
+        </geometry>
+      </collision>
+
+      <!-- Arm FR (front-right) -->
+      <visual name="arm_fr_visual">
+        <pose>0.08 -0.08 0 0 0 -0.7854</pose>
+        <geometry><box><size>0.22 0.025 0.012</size></box></geometry>
+        <material><ambient>0.3 0.3 0.3 1</ambient></material>
+      </visual>
+      <!-- Arm BL (back-left) -->
+      <visual name="arm_bl_visual">
+        <pose>-0.08 0.08 0 0 0 -0.7854</pose>
+        <geometry><box><size>0.22 0.025 0.012</size></box></geometry>
+        <material><ambient>0.3 0.3 0.3 1</ambient></material>
+      </visual>
+      <!-- Arm FL (front-left) -->
+      <visual name="arm_fl_visual">
+        <pose>0.08 0.08 0 0 0 0.7854</pose>
+        <geometry><box><size>0.22 0.025 0.012</size></box></geometry>
+        <material><ambient>0.3 0.3 0.3 1</ambient></material>
+      </visual>
+      <!-- Arm BR (back-right) -->
+      <visual name="arm_br_visual">
+        <pose>-0.08 -0.08 0 0 0 0.7854</pose>
+        <geometry><box><size>0.22 0.025 0.012</size></box></geometry>
+        <material><ambient>0.3 0.3 0.3 1</ambient></material>
+      </visual>
+
+      <!-- Payload bay (below body) -->
+      <visual name="payload_bay_visual">
+        <pose>0 0 -0.06 0 0 0</pose>
+        <geometry><box><size>0.12 0.10 0.05</size></box></geometry>
+        <material><ambient>0.6 0.2 0.0 1</ambient><diffuse>0.8 0.3 0.0 1</diffuse></material>
+      </visual>
+      <collision name="payload_bay_collision">
+        <pose>0 0 -0.06 0 0 0</pose>
+        <geometry><box><size>0.12 0.10 0.05</size></box></geometry>
+      </collision>
+
+      <!-- IMU sensor -->
+      <sensor name="imu_sensor" type="imu">
+        <pose>0 0 0 0 0 0</pose>
+        <always_on>true</always_on>
+        <update_rate>200</update_rate>
+        <imu>
+          <angular_velocity>
+            <x><noise type="gaussian"><mean>0</mean><stddev>0.009</stddev></noise></x>
+            <y><noise type="gaussian"><mean>0</mean><stddev>0.009</stddev></noise></y>
+            <z><noise type="gaussian"><mean>0</mean><stddev>0.009</stddev></noise></z>
+          </angular_velocity>
+          <linear_acceleration>
+            <x><noise type="gaussian"><mean>0</mean><stddev>0.021</stddev></noise></x>
+            <y><noise type="gaussian"><mean>0</mean><stddev>0.021</stddev></noise></y>
+            <z><noise type="gaussian"><mean>0</mean><stddev>0.021</stddev></noise></z>
+          </linear_acceleration>
+        </imu>
+        <plugin name="imu_plugin" filename="libgazebo_ros_imu_sensor.so">
+          <ros>
+            <namespace>/drone</namespace>
+            <remapping>~/out:=/imu/data</remapping>
+          </ros>
+          <initial_orientation_as_reference>false</initial_orientation_as_reference>
+          <frame_name>base_link</frame_name>
+        </plugin>
+      </sensor>
+
+      <!-- GPS sensor (simulating u-blox M9N) -->
+      <sensor name="gps_sensor" type="gps">
+        <pose>0 0 0.04 0 0 0</pose>
+        <always_on>true</always_on>
+        <update_rate>10</update_rate>
+        <gps>
+          <position_sensing>
+            <horizontal><noise type="gaussian"><mean>0</mean><stddev>0.5</stddev></noise></horizontal>
+            <vertical><noise type="gaussian"><mean>0</mean><stddev>0.8</stddev></noise></vertical>
+          </position_sensing>
+          <velocity_sensing>
+            <horizontal><noise type="gaussian"><mean>0</mean><stddev>0.05</stddev></noise></horizontal>
+            <vertical><noise type="gaussian"><mean>0</mean><stddev>0.1</stddev></noise></vertical>
+          </velocity_sensing>
+        </gps>
+        <plugin name="gps_plugin" filename="libgazebo_ros_gps_sensor.so">
+          <ros>
+            <namespace>/drone</namespace>
+            <remapping>~/out:=/gps/fix</remapping>
+          </ros>
+          <frame_name>base_link</frame_name>
+        </plugin>
+      </sensor>
+
+      <!-- Downward camera (for ArUco precision landing) -->
+      <sensor name="camera_down" type="camera">
+        <pose>0 0 -0.09 0 1.5708 0</pose>
+        <always_on>true</always_on>
+        <update_rate>30</update_rate>
+        <camera name="down_camera">
+          <horizontal_fov>1.5708</horizontal_fov>
+          <image>
+            <width>640</width>
+            <height>480</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip><near>0.05</near><far>50</far></clip>
+          <noise><type>gaussian</type><mean>0</mean><stddev>0.007</stddev></noise>
+        </camera>
+        <plugin name="camera_down_plugin" filename="libgazebo_ros_camera.so">
+          <ros>
+            <namespace>/drone</namespace>
+            <remapping>image_raw:=/camera/down/image_raw</remapping>
+            <remapping>camera_info:=/camera/down/camera_info</remapping>
+          </ros>
+          <camera_name>down</camera_name>
+          <frame_name>camera_down_frame</frame_name>
+        </plugin>
+      </sensor>
+
+      <!-- Forward camera (for visual obstacle detection) -->
+      <sensor name="camera_forward" type="camera">
+        <pose>0.09 0 0.01 0 0 0</pose>
+        <always_on>true</always_on>
+        <update_rate>30</update_rate>
+        <camera name="forward_camera">
+          <horizontal_fov>1.0472</horizontal_fov>
+          <image>
+            <width>640</width>
+            <height>480</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip><near>0.05</near><far>100</far></clip>
+          <noise><type>gaussian</type><mean>0</mean><stddev>0.007</stddev></noise>
+        </camera>
+        <plugin name="camera_forward_plugin" filename="libgazebo_ros_camera.so">
+          <ros>
+            <namespace>/drone</namespace>
+            <remapping>image_raw:=/camera/forward/image_raw</remapping>
+            <remapping>camera_info:=/camera/forward/camera_info</remapping>
+          </ros>
+          <camera_name>forward</camera_name>
+          <frame_name>camera_forward_frame</frame_name>
+        </plugin>
+      </sensor>
+
+      <!-- 2D LiDAR (simulating RPLidar A1M8 — 360° at 10 Hz, 12 m range) -->
+      <sensor name="lidar" type="ray">
+        <pose>0 0 0.035 0 0 0</pose>
+        <always_on>true</always_on>
+        <update_rate>10</update_rate>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>360</samples>
+              <resolution>1</resolution>
+              <min_angle>-3.14159</min_angle>
+              <max_angle>3.14159</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.15</min>
+            <max>12.0</max>
+            <resolution>0.01</resolution>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <mean>0</mean>
+            <stddev>0.01</stddev>
+          </noise>
+        </ray>
+        <plugin name="lidar_plugin" filename="libgazebo_ros_ray_sensor.so">
+          <ros>
+            <namespace>/drone</namespace>
+            <remapping>~/out:=/scan</remapping>
+          </ros>
+          <output_type>sensor_msgs/LaserScan</output_type>
+          <frame_name>lidar_frame</frame_name>
+        </plugin>
+      </sensor>
+
+    </link>
+
+    <!-- ================================================================
+         ROTOR LINKS
+         Motor 1: Front-Right  (CW,  +X +Y side → Gazebo ENU: +x, -y)
+         Motor 2: Rear-Left    (CW,  −X −Y side → Gazebo ENU: -x, +y)
+         Motor 3: Front-Left   (CCW, +X −Y side → Gazebo ENU: +x, +y)
+         Motor 4: Rear-Right   (CCW, −X +Y side → Gazebo ENU: -x, -y)
+    ================================================================ -->
+
+    <!-- Motor 1: Front-Right -->
+    <link name="rotor_0">
+      <pose>0.159 -0.159 0.021 0 0 0</pose>
+      <inertial>
+        <mass>0.025</mass>
+        <inertia><ixx>9.75e-07</ixx><ixy>0</ixy><ixz>0</ixz>
+                 <iyy>0.000166704</iyy><iyz>0</iyz><izz>0.000167604</izz></inertia>
+      </inertial>
+      <visual name="rotor_0_visual">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry><cylinder><length>0.005</length><radius>0.1905</radius></cylinder></geometry>
+        <material><ambient>0 0 0.8 0.5</ambient><diffuse>0 0 0.8 0.5</diffuse></material>
+      </visual>
+    </link>
+    <joint name="rotor_0_joint" type="revolute">
+      <parent>base_link</parent><child>rotor_0</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit><lower>-1e+16</lower><upper>1e+16</upper></limit>
+        <dynamics><damping>0.004</damping></dynamics>
+      </axis>
+    </joint>
+
+    <!-- Motor 2: Rear-Left -->
+    <link name="rotor_1">
+      <pose>-0.159 0.159 0.021 0 0 0</pose>
+      <inertial>
+        <mass>0.025</mass>
+        <inertia><ixx>9.75e-07</ixx><ixy>0</ixy><ixz>0</ixz>
+                 <iyy>0.000166704</iyy><iyz>0</iyz><izz>0.000167604</izz></inertia>
+      </inertial>
+      <visual name="rotor_1_visual">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry><cylinder><length>0.005</length><radius>0.1905</radius></cylinder></geometry>
+        <material><ambient>0 0 0.8 0.5</ambient><diffuse>0 0 0.8 0.5</diffuse></material>
+      </visual>
+    </link>
+    <joint name="rotor_1_joint" type="revolute">
+      <parent>base_link</parent><child>rotor_1</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit><lower>-1e+16</lower><upper>1e+16</upper></limit>
+        <dynamics><damping>0.004</damping></dynamics>
+      </axis>
+    </joint>
+
+    <!-- Motor 3: Front-Left -->
+    <link name="rotor_2">
+      <pose>0.159 0.159 0.021 0 0 0</pose>
+      <inertial>
+        <mass>0.025</mass>
+        <inertia><ixx>9.75e-07</ixx><ixy>0</ixy><ixz>0</ixz>
+                 <iyy>0.000166704</iyy><iyz>0</iyz><izz>0.000167604</izz></inertia>
+      </inertial>
+      <visual name="rotor_2_visual">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry><cylinder><length>0.005</length><radius>0.1905</radius></cylinder></geometry>
+        <material><ambient>0.8 0 0 0.5</ambient><diffuse>0.8 0 0 0.5</diffuse></material>
+      </visual>
+    </link>
+    <joint name="rotor_2_joint" type="revolute">
+      <parent>base_link</parent><child>rotor_2</child>
+      <axis>
+        <xyz>0 0 -1</xyz>
+        <limit><lower>-1e+16</lower><upper>1e+16</upper></limit>
+        <dynamics><damping>0.004</damping></dynamics>
+      </axis>
+    </joint>
+
+    <!-- Motor 4: Rear-Right -->
+    <link name="rotor_3">
+      <pose>-0.159 -0.159 0.021 0 0 0</pose>
+      <inertial>
+        <mass>0.025</mass>
+        <inertia><ixx>9.75e-07</ixx><ixy>0</ixy><ixz>0</ixz>
+                 <iyy>0.000166704</iyy><iyz>0</iyz><izz>0.000167604</izz></inertia>
+      </inertial>
+      <visual name="rotor_3_visual">
+        <pose>0 0 0 0 0 0</pose>
+        <geometry><cylinder><length>0.005</length><radius>0.1905</radius></cylinder></geometry>
+        <material><ambient>0.8 0 0 0.5</ambient><diffuse>0.8 0 0 0.5</diffuse></material>
+      </visual>
+    </link>
+    <joint name="rotor_3_joint" type="revolute">
+      <parent>base_link</parent><child>rotor_3</child>
+      <axis>
+        <xyz>0 0 -1</xyz>
+        <limit><lower>-1e+16</lower><upper>1e+16</upper></limit>
+        <dynamics><damping>0.004</damping></dynamics>
+      </axis>
+    </joint>
+
+    <!-- ================================================================
+         ARDUPILOT PLUGIN
+         Connects ArduCopter SITL (UDP 9002/9003) to Gazebo physics.
+         fdm_port_in:  port Gazebo sends sensor data TO ArduPilot
+         fdm_port_out: port ArduPilot sends servo outputs TO Gazebo
+    ================================================================ -->
+    <plugin name="ArduPilotPlugin" filename="libArduPilotPlugin.so">
+      <fdm_addr>127.0.0.1</fdm_addr>
+      <fdm_port_in>9002</fdm_port_in>
+      <fdm_port_out>9003</fdm_port_out>
+      <connectionTimeoutMaxCount>5</connectionTimeoutMaxCount>
+      <!-- Rotate Gazebo ENU frame to ArduPilot NED frame -->
+      <modelXYZToAirplaneXForwardZDown>0 0 0 3.141593 0 0</modelXYZToAirplaneXForwardZDown>
+      <gazeboXYZToNED>0 0 0 3.141593 0 1.5707963</gazeboXYZToNED>
+      <imuName>imu_sensor</imuName>
+
+      <!-- Motor 1: Front-Right CW (negative multiplier = CW) -->
+      <control channel="0">
+        <jointName>rotor_0_joint</jointName>
+        <useForce>1</useForce>
+        <multiplier>-838</multiplier>
+        <offset>-0.5</offset>
+        <servo_min>1000</servo_min>
+        <servo_max>2000</servo_max>
+        <type>VELOCITY</type>
+        <p_gain>0.20</p_gain>
+        <i_gain>0</i_gain>
+        <d_gain>0</d_gain>
+        <i_max>0</i_max>
+        <i_min>0</i_min>
+        <cmd_max>2.5</cmd_max>
+        <cmd_min>-2.5</cmd_min>
+      </control>
+
+      <!-- Motor 2: Rear-Left CW -->
+      <control channel="1">
+        <jointName>rotor_1_joint</jointName>
+        <useForce>1</useForce>
+        <multiplier>-838</multiplier>
+        <offset>-0.5</offset>
+        <servo_min>1000</servo_min>
+        <servo_max>2000</servo_max>
+        <type>VELOCITY</type>
+        <p_gain>0.20</p_gain>
+        <i_gain>0</i_gain>
+        <d_gain>0</d_gain>
+        <i_max>0</i_max>
+        <i_min>0</i_min>
+        <cmd_max>2.5</cmd_max>
+        <cmd_min>-2.5</cmd_min>
+      </control>
+
+      <!-- Motor 3: Front-Left CCW (positive multiplier = CCW) -->
+      <control channel="2">
+        <jointName>rotor_2_joint</jointName>
+        <useForce>1</useForce>
+        <multiplier>838</multiplier>
+        <offset>-0.5</offset>
+        <servo_min>1000</servo_min>
+        <servo_max>2000</servo_max>
+        <type>VELOCITY</type>
+        <p_gain>0.20</p_gain>
+        <i_gain>0</i_gain>
+        <d_gain>0</d_gain>
+        <i_max>0</i_max>
+        <i_min>0</i_min>
+        <cmd_max>2.5</cmd_max>
+        <cmd_min>-2.5</cmd_min>
+      </control>
+
+      <!-- Motor 4: Rear-Right CCW -->
+      <control channel="3">
+        <jointName>rotor_3_joint</jointName>
+        <useForce>1</useForce>
+        <multiplier>838</multiplier>
+        <offset>-0.5</offset>
+        <servo_min>1000</servo_min>
+        <servo_max>2000</servo_max>
+        <type>VELOCITY</type>
+        <p_gain>0.20</p_gain>
+        <i_gain>0</i_gain>
+        <d_gain>0</d_gain>
+        <i_max>0</i_max>
+        <i_min>0</i_min>
+        <cmd_max>2.5</cmd_max>
+        <cmd_min>-2.5</cmd_min>
+      </control>
+    </plugin>
+
+  </model>
+</sdf>
