@@ -1,0 +1,80 @@
+# drone_params.yaml — unified parameter file for all delivery_drone nodes
+# All distances in metres, times in seconds, speeds in m/s.
+
+# ============================================================
+# mission_manager_node
+# ============================================================
+mission_manager_node:
+  ros__parameters:
+    # Home / swap station (local ENU metres — matches world origin)
+    home_x: 0.0
+    home_y: 0.0
+
+    # Delivery target (hospital entrance in delivery_urban.world)
+    delivery_x: 80.0
+    delivery_y: 5.0
+
+    # Altitudes
+    cruise_alt_m: 15.0
+    deliver_alt_m: 5.0
+
+    # Timeouts
+    preflight_timeout_s: 30.0
+    arm_timeout_s: 10.0
+    takeoff_timeout_s: 30.0
+    delivery_hover_s: 5.0     # Hover seconds at delivery point before drop
+    swap_timeout_s: 300.0     # Max wait for battery swap (5 min)
+
+# ============================================================
+# obstacle_avoidance_node (VFH+)
+# ============================================================
+obstacle_avoidance_node:
+  ros__parameters:
+    alpha_deg: 5.0            # Polar histogram sector width (degrees)
+    threshold: 0.60           # Obstacle density threshold (tune to env)
+    safety_radius_m: 0.60     # Drone half-width + margin
+    max_speed_ms: 2.5         # Max cruise speed during avoidance
+    max_range_m: 8.0          # Max LiDAR range used (clip further readings)
+    hysteresis_deg: 10.0      # Hysteresis dead-band (prevents oscillation)
+    cruise_altitude_m: 15.0   # Target altitude maintained by Z P-controller
+    goal_reached_radius_m: 2.0
+
+# ============================================================
+# battery_monitor_node
+# ============================================================
+battery_monitor_node:
+  ros__parameters:
+    swap_threshold_pct: 25.0  # Request swap if landed with < 25%
+    cell_count: 6             # 6S LiPo
+    publish_rate_hz: 5.0
+
+# ============================================================
+# precision_landing_node
+# ============================================================
+precision_landing_node:
+  ros__parameters:
+    marker_id: 0              # ArUco DICT_4X4_50 marker ID on home pad
+    marker_size_m: 0.50       # Physical marker side length
+    # Camera offset from centre of gravity (metres, body frame)
+    # Positive X = forward, positive Y = right
+    camera_frame_offset_x: 0.0
+    camera_frame_offset_y: 0.0
+
+# ============================================================
+# payload_manager_node
+# ============================================================
+payload_manager_node:
+  ros__parameters:
+    min_release_alt_m: 2.0    # Safety: do not release below 2 m
+    simulation_mode: true
+
+# ============================================================
+# MAVROS (fcu_url etc.)
+# ============================================================
+mavros:
+  ros__parameters:
+    fcu_url: "udp://:14550"
+    gcs_url: ""
+    target_system_id: 1
+    target_component_id: 1
+    fcu_protocol: "v2.0"
